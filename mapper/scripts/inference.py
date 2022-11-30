@@ -9,11 +9,11 @@ import sys
 import time
 
 from tqdm import tqdm
-
-from mapper.training.train_utils import convert_s_tensor_to_list
-
 sys.path.append(".")
 sys.path.append("..")
+from mapper.training.train_utils import convert_s_tensor_to_list
+
+
 
 from mapper.datasets.latents_dataset import LatentsDataset, StyleSpaceLatentsDataset
 

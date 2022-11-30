@@ -27,7 +27,9 @@ class Coach:
 
 		# Initialize network
 		self.net = StyleCLIPMapper(self.opts).to(self.device)
-
+		# print(self.opts)
+		# print(self.net.state_dict().keys())
+		# exit()
 		# Initialize loss
 		if self.opts.id_lambda > 0:
 			self.id_loss = id_loss.IDLoss(self.opts).to(self.device).eval()
@@ -53,6 +55,8 @@ class Coach:
 										  drop_last=True)
 
 		self.text_inputs = torch.cat([clip.tokenize(self.opts.description)]).cuda()
+		
+		
 
 		# Initialize logger
 		log_dir = os.path.join(opts.exp_dir, 'logs')
@@ -85,7 +89,10 @@ class Coach:
 					w_hat = [c + 0.1 * delta_c for (c, delta_c) in zip(w, delta)]
 					x_hat, _, w_hat = self.net.decoder([w_hat], input_is_latent=True, return_latents=True, randomize_noise=False, truncation=1, input_is_stylespace=True)
 				else:
-					w_hat = w + 0.1 * self.net.mapper(w)
+					if self.opts.mapper_type == "AttentionMapper":
+						w_hat = w + 0.1 * self.net.mapper(w,self.text_inputs)
+					else:
+						w_hat = w + 0.1 * self.net.mapper(w)
 					x_hat, w_hat, _ = self.net.decoder([w_hat], input_is_latent=True, return_latents=True, randomize_noise=False, truncation=1)
 				loss, loss_dict = self.calc_loss(w, x, w_hat, x_hat)
 				loss.backward()
@@ -140,7 +147,10 @@ class Coach:
 					w_hat = [c + 0.1 * delta_c for (c, delta_c) in zip(w, delta)]
 					x_hat, _, w_hat = self.net.decoder([w_hat], input_is_latent=True, return_latents=True, randomize_noise=False, truncation=1, input_is_stylespace=True)
 				else:
-					w_hat = w + 0.1 * self.net.mapper(w)
+					if self.opts.mapper_type == "AttentionMapper":
+						w_hat = w + 0.1 * self.net.mapper(w,self.text_inputs)
+					else:
+						w_hat = w + 0.1 * self.net.mapper(w)
 					x_hat, w_hat, _ = self.net.decoder([w_hat], input_is_latent=True, return_latents=True, randomize_noise=False, truncation=1)
 				loss, cur_loss_dict = self.calc_loss(w, x, w_hat, x_hat)
 			agg_loss_dict.append(cur_loss_dict)

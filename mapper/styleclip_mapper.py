@@ -30,6 +30,8 @@ class StyleCLIPMapper(nn.Module):
 			mapper = latent_mappers.SingleMapper(self.opts)
 		elif self.opts.mapper_type == 'LevelsMapper':
 			mapper = latent_mappers.LevelsMapper(self.opts)
+		elif self.opts.mapper_type == "AttentionMapper":
+			mapper = latent_mappers.AttentionMapper(self.opts)
 		else:
 			raise Exception('{} is not a valid mapper'.format(self.opts.mapper_type))
 		return mapper
